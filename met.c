@@ -55,11 +55,11 @@ void met(std::string fin){
      cout << "nfiles = " << nfile << endl;
   }
 
-  TH1D* qT = new TH1D("qT", "Removed Vector Boson", 250, 0, 250);
+  TH1D* qT = new TH1D("qT", "Removed Vector Boson", 200, 0, 200);
   TH1D* uT = new TH1D("uT", "Sum of All Particels except Removed Vector Boson ", 100, 0, 200);
-  TH1D* all = new TH1D("all", "Sum of All Particels ", 400, -200, 200);
-  TH1D* uP = new  TH1D(" uParaAddqT", "Additon of uT parallel and qT", 100, -300, 300);
-  TH1D* uPp = new  TH1D(" uPerp", "uT perpendicular ", 100, -300, 300);
+  TH1D* all = new TH1D("all", "Sum of All Particels ", 400, 0, 200);
+  TH1D* uP = new  TH1D(" uParaAddqT", "Additon of uT parallel and qT", 600, -300, 300);
+  TH1D* uPp = new  TH1D(" uPerp", "uT perpendicular ", 600, -300, 300);
 
 
   TreeReader data(infiles); // v5.3.12
@@ -120,9 +120,12 @@ void met(std::string fin){
 	     TLorentzVector  Z = ele1 + ele2; 
 	     if ((71<Z.M())&&(Z.M()<111)){
                 flag=1;
-	        q.SetPtEtaPhiM(elePt[i]+elePt[j],eleEta[i]+ eleEta[j], elePhi[i]+elePhi[j], 0.000511*2);
+                q=Z;
+	        //q.SetPtEtaPhiM(elePt[i]+elePt[j],eleEta[i]+ eleEta[j], elePhi[i]+elePhi[j], 0.000511*2);
+                //cout<<"qset="<<q.Px() <<","<<q.Py() <<endl;
+                //cout<<"qvector"<<elePt[i]*cos(elePhi[i])+elePt[j]*cos(elePhi[j])<<","<<elePt[i]*sin(elePhi[i])+elePt[j]*sin(elePhi[j]) <<endl;
                 for (int m = 0; m <nJet; m++) {
-		  if (((eleEta[i]-jetEta[m])* (eleEta[i]-jetEta[m])+(elePhi[i]-jetPhi[m])*(elePhi[i]-jetPhi[m]))<0.16)over[m]=0;                        if (((eleEta[j]-jetEta[m])* (eleEta[j]-jetEta[m])+(elePhi[j]-jetPhi[m])*(elePhi[j]-jetPhi[m]))<0.16)over[m]=0;
+		    if (((eleEta[i]-jetEta[m])* (eleEta[i]-jetEta[m])+(elePhi[i]-jetPhi[m])*(elePhi[i]-jetPhi[m]))<0.16)over[m]=0;                          if (((eleEta[j]-jetEta[m])* (eleEta[j]-jetEta[m])+(elePhi[j]-jetPhi[m])*(elePhi[j]-jetPhi[m]))<0.16)over[m]=0;
 	        }
 		break;
              }
@@ -143,7 +146,8 @@ void met(std::string fin){
 	          TLorentzVector  Z = mu1 + mu2;        
     	          if ((71<Z.M())&&(Z.M()<111)){	  
                       flag=1;
-                      q.SetPtEtaPhiM(muPt[i]+muPt[j], muEta[i]+muEta[j],muPhi[i]+ muPhi[j], 0.1057*2);
+                      q=Z;
+                      //q.SetPtEtaPhiM(muPt[i]+muPt[j], muEta[i]+muEta[j],muPhi[i]+ muPhi[j], 0.1057*2);
                       for (int m = 0; m <nJet; m++) {
 			if (((muEta[i]-jetEta[m])* (muEta[i]-jetEta[m])+(muPhi[i]-jetPhi[m])*(muPhi[i]-jetPhi[m]))<0.16)over[m]=0;
 			if (((muEta[j]-jetEta[m])* (muEta[j]-jetEta[m])+(muPhi[j]-jetPhi[m])*(muPhi[j]-jetPhi[m]))<0.16)over[m]=0;
@@ -168,8 +172,23 @@ void met(std::string fin){
         all->Fill(u.Pt());
         u=u-q;
         uT->Fill(u.Pt());
-        uP->Fill(q.Px()*u.Px()+q.Py()*u.Py()+q.Pt());
-        uPp->Fill(u.Pt()-q.Px()*u.Px()-q.Py()*u.Py());
+        double temp=q.Px()*u.Px()+q.Py()*u.Py();
+        temp=temp/q.Pt();
+        double tempUx=u.Px()-(temp*q.Px())/q.Pt();
+        double tempUy=u.Py()-(temp*q.Py())/q.Pt();
+        //cout<<"q=("<<q.Px() <<"," << q.Py()<<")"<<endl;
+        //cout<<"u=("<<u.Px() <<"," << u.Py()<<")"<<endl;
+        //cout<<"up=("<<(temp*q.Px())/q.Pt() <<"," << (temp*q.Py())/q.Pt()<<")"<<endl;
+        temp=temp+q.Pt();
+        uP->Fill(temp);
+        //cout<<"up"<<temp<<endl;
+        //temp=u.Pt()-(((q.Px()*u.Px()+q.Py()*u.Py())/q.Pt());
+        temp=sqrt(tempUx*tempUx+tempUy*tempUy);
+        temp= tempUx>0? temp:  -temp;
+        
+        //cout<<"upp="<<temp<<endl;
+        uPp->Fill(temp);
+
 
      }
   }
