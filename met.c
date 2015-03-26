@@ -57,7 +57,7 @@ void met(std::string fin){
 
   TH1D* qT = new TH1D("qT", "Removed Vector Boson", 250, 0, 250);
   TH1D* uT = new TH1D("uT", "Sum of All Particels except Removed Vector Boson ", 100, 0, 200);
-  TH1D* all = new TH1D("all", "Sum of All Particels ", 100, 0, 200);
+  TH1D* all = new TH1D("all", "Sum of All Particels ", 400, -200, 200);
   TH1D* uP = new  TH1D(" uParaAddqT", "Additon of uT parallel and qT", 100, -300, 300);
   TH1D* uPp = new  TH1D(" uPerp", "uT perpendicular ", 100, -300, 300);
 
@@ -119,53 +119,44 @@ void met(std::string fin){
 	     ele2.SetPtEtaPhiM(elePt[j], eleEta[j], elePhi[j], 0.000511);
 	     TLorentzVector  Z = ele1 + ele2; 
 	     if ((71<Z.M())&&(Z.M()<111)){
-             flag=1;
-	     //cout<<"elI="<<i<<",elJ="<<j<<endl;
-             if (elePt[j]>elePt[i])q.SetPtEtaPhiM(elePt[j], eleEta[j], elePhi[j], 0.000511);
-             if (elePt[j]<elePt[i])q.SetPtEtaPhiM(elePt[i], eleEta[i], elePhi[i], 0.000511);
-	     }
-          }
-          for (int m = 0; m <nJet; m++) {
-                if ((eleEta[i]-jetEta[m])* (eleEta[i]-jetEta[m])+(elePhi[i]-jetEta[m])*(elePhi[i]-jetEta[m])<0.16)over[m]=0;
-          }
-      }
-
-
-      for (int i = 0; i <nMu; i++) {
-           TLorentzVector mu1 ; 
-	   mu1.SetPtEtaPhiM(muPt[i], muEta[i], muPhi[i], 0.1057);
-	   if(muPt[i]<20)continue;
-           for (int j = i + 1; j < nMu; j++) {
-                if(muPt[j]<20)continue;
-      	        TLorentzVector mu2;
-                mu2.SetPtEtaPhiM(muPt[j], muEta[j], muPhi[j], 0.1057);
-	        TLorentzVector  Z = mu1 + mu2;        
-    	        if ((71<Z.M())&&(Z.M()<111)){	  
                 flag=1;
-	        //cout<<"muI="<<i<<",muJ="<<j<<endl;
-                if (muPt[j]>muPt[i])q.SetPtEtaPhiM(muPt[j], muEta[j], muPhi[j], 0.1057);
-                if (muPt[j]<muPt[i])q.SetPtEtaPhiM(muPt[i], muEta[i], muPhi[i], 0.1057);
-                }
-           }
-           for (int m = 0; m <nJet; m++) {
-	        if ((muEta[i]-jetEta[m])* (muEta[i]-jetEta[m])+(muPhi[i]-jetEta[m])*(muPhi[i]-jetEta[m])<0.16)over[m]=0;
-           } 
+	        q.SetPtEtaPhiM(elePt[i]+elePt[j],eleEta[i]+ eleEta[j], elePhi[i]+elePhi[j], 0.000511*2);
+                for (int m = 0; m <nJet; m++) {
+		  if (((eleEta[i]-jetEta[m])* (eleEta[i]-jetEta[m])+(elePhi[i]-jetPhi[m])*(elePhi[i]-jetPhi[m]))<0.16)over[m]=0;                        if (((eleEta[j]-jetEta[m])* (eleEta[j]-jetEta[m])+(elePhi[j]-jetPhi[m])*(elePhi[j]-jetPhi[m]))<0.16)over[m]=0;
+	        }
+		break;
+             }
+          
+         }
+         if(flag)break;
      }
 
+     if (!flag){ 
+         for (int i = 0; i <nMu; i++) {
+             TLorentzVector mu1 ; 
+	     mu1.SetPtEtaPhiM(muPt[i], muEta[i], muPhi[i], 0.1057);
+  	     if(muPt[i]<20)continue;
+             for (int j = i + 1; j < nMu; j++) {
+                  if(muPt[j]<20)continue;
+      	          TLorentzVector mu2;
+                  mu2.SetPtEtaPhiM(muPt[j], muEta[j], muPhi[j], 0.1057);
+	          TLorentzVector  Z = mu1 + mu2;        
+    	          if ((71<Z.M())&&(Z.M()<111)){	  
+                      flag=1;
+                      q.SetPtEtaPhiM(muPt[i]+muPt[j], muEta[i]+muEta[j],muPhi[i]+ muPhi[j], 0.1057*2);
+                      for (int m = 0; m <nJet; m++) {
+			if (((muEta[i]-jetEta[m])* (muEta[i]-jetEta[m])+(muPhi[i]-jetPhi[m])*(muPhi[i]-jetPhi[m]))<0.16)over[m]=0;
+			if (((muEta[j]-jetEta[m])* (muEta[j]-jetEta[m])+(muPhi[j]-jetPhi[m])*(muPhi[j]-jetPhi[m]))<0.16)over[m]=0;
+                      } 
+                      break;
+                  }
+             }
+             if(flag)break;
+         }
+     }
 
      if (flag){
-        for (int i = 0; i <nEl; i++) {
-           TLorentzVector ele1;
-           ele1.SetPtEtaPhiM(elePt[i], eleEta[i], elePhi[i], 0.000511);    
-      
-           u=u+ele1;
- 
-        }
-        for (int i = 0; i <nMu; i++) {
-           TLorentzVector mu1 ; 
-   	   mu1.SetPtEtaPhiM(muPt[i], muEta[i], muPhi[i], 0.1057);
-           u=u+mu1;
-        }
+        
         for (int i = 0; i <nJet; i++) {
            TLorentzVector jet;
            jet.SetPtEtaPhiM(jetPt[i], jetEta[i], jetPhi[i], jetMass[i]);
@@ -173,6 +164,7 @@ void met(std::string fin){
         }
 
         qT->Fill(q.Pt());
+        u=u+q;
         all->Fill(u.Pt());
         u=u-q;
         uT->Fill(u.Pt());
@@ -182,7 +174,7 @@ void met(std::string fin){
      }
   }
 
-  TFile* outFile = new TFile("geo.root","recreate");    
+  TFile* outFile = new TFile("met.root","recreate");    
   qT->Write();
   uT->Write();
   all->Write();
