@@ -55,11 +55,11 @@ void met(std::string fin){
      cout << "nfiles = " << nfile << endl;
   }
 
-  TH1D* qT = new TH1D("qT", "Removed Vector Boson", 200, 0, 200);
-  TH1D* uT = new TH1D("uT", "Sum of All Particels except Removed Vector Boson ", 100, 0, 200);
-  TH1D* all = new TH1D("all", "Sum of All Particels ", 400, 0, 200);
-  TH1D* uP = new  TH1D("uParaAddqT", "Additon of uT parallel and qT", 600, -300, 300);
-  TH1D* uPp = new  TH1D("uPerp", "uT perpendicular ", 300, -150, 150);
+  TH1D* qT = new TH1D("qT", "Removed Vector Boson", 50, 0, 200);
+  TH1D* uT = new TH1D("uT", "Sum of All Particels except Removed Vector Boson ", 50, 0, 200);
+  TH1D* all = new TH1D("all", "Sum of All Particels ", 50, 0, 200);
+  TH1D* uP = new  TH1D("uParaAddqT", "Additon of uT parallel and qT", 50, -200, 200);
+  TH1D* uPp = new  TH1D("uPerp", "uT perpendicular ", 50, -200, 200);
 
 
   TreeReader data(infiles); // v5.3.12
@@ -203,9 +203,9 @@ void met(std::string fin){
 	   mu1.SetPtEtaPhiM(muPt[stMu], muEta[stMu], muPhi[stMu], 0.1057);
            mu2.SetPtEtaPhiM(muPt[ndMu], muEta[ndMu], muPhi[ndMu], 0.1057);
            Z=mu1+mu2;
-           if ( muTrig.find("data") !=  std::string::npos ){
-	     if(Z.Pt()<70)continue;
-           }
+           
+	   if(Z.Pt()<80)continue;
+          
            if ((71<Z.M())&&(Z.M()<111)){	  
                    flag=1;
                    q=Z;
