@@ -13,7 +13,8 @@ using namespace std;
 TFile*  f[7];
 TH1D* h[9];
 TCanvas* c1;
-int COLOR[6]={1,14,42,44,46,48};
+int COLOR[6]={1,14,42,44,46,4
+//lumi*crosssecton/events
 double factor[8]={1,1,19712.225*63.5/11764538,19712.225*39.4/12511326,19712.225*25.8/10783509,19712.225*56.0/9959752,19712.225*22.4/9910267,19712.225*7.6/9769891};
 std::string dataset[6]={"data","uncertainties","DY_PTZ-70to100","DY_PTZ-100","Top","EWK"};
 void drawSameBase(string ob,int aDraw){
